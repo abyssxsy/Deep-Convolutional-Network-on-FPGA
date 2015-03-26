@@ -12,8 +12,8 @@ int main(void)
 	const int ni = 1;
 	const int no = 2;
 	const int k = 5;
-	const int row = 12;
-	const int col = 12;
+	const int row = 28;
+	const int col = 28;
 	const int batch_size = 384;
 
 	int w_size = no*k*k*sizeof(real);

@@ -19,7 +19,7 @@ public class CNN_BP_Softmax_V1Manager extends CustomManager {
 	private static final int iParaBitWidth = 16;
 	private static final int iOutSize = 10;
 	private static final int iBatchSize = 384;
-	private static final int iVecSize = 12;
+	private static final int iVecSize = 24;
 
 	public CNN_BP_Softmax_V1Manager(CNN_BP_Softmax_V1EngineParameters engineParameters) {
 		super(engineParameters);

@@ -17,10 +17,10 @@ public class CNN_BP_Conv_V1Manager extends CustomManager {
 	private static final CPUTypes type = CPUTypes.DOUBLE;
 	private static final int iK = 5;
 	private static final int iParaBitWidth = 16;
-	private static final int iRowSize = 12;
-	private static final int iColSize = 12;
+	private static final int iRowSize = 28;
+	private static final int iColSize = 28;
 	private static final int iBatchSize = 384;
-	private static final int iVecSize = 2;
+	private static final int iVecSize = 1;
 
 	public CNN_BP_Conv_V1Manager(CNN_BP_Conv_V1EngineParameters engineParameters) {
 		super(engineParameters);

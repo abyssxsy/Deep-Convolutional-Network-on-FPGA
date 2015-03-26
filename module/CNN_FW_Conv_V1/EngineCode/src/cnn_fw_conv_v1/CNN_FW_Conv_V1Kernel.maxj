@@ -2,7 +2,6 @@ package cnn_fw_conv_v1;
 
 import com.maxeler.maxcompiler.v2.kernelcompiler.Kernel;
 import com.maxeler.maxcompiler.v2.kernelcompiler.KernelParameters;
-import com.maxeler.maxcompiler.v2.kernelcompiler.op_management.MathOps;
 import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.Count;
 import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.Count.Counter;
 import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.memory.Memory;
@@ -59,10 +58,8 @@ class CNN_FW_Conv_V1Kernel extends Kernel {
 		DFEVar ctr_w = (wIdx<iK*iK);
 		DFEVar ctr_z = (row>=(iK-1)) & (col>=(iK-1));
 
-		io.pushInputRegistering(false);
 		DFEVector<DFEVar> old = io.input("old", vecType, ctr_z);
 		DFEVector<DFEVar> x = io.input("x", vecType);
-		io.popInputRegistering();
 		DFEVar in_w = io.input("w", type, ctr_w);
 		Memory<DFEVar> mappedW = mem.alloc(type, iK*iK);
 		mappedW.write(wIdx.slice(0,iK2BitWidth), in_w, ctr_w);
@@ -72,7 +69,6 @@ class CNN_FW_Conv_V1Kernel extends Kernel {
 		for (int k=0;k<iVecSize;++k){
 			sum[k] = old[k];
 		}
-		int cnt = 0;
 		for (int i=0;i<iK;++i){
 			for (int j=0;j<iK;++j){
 				int x_offset = -((iK-1-i)*iColSize+(iK-1-j))*iBatchSubSize;
@@ -81,10 +77,6 @@ class CNN_FW_Conv_V1Kernel extends Kernel {
 				DFEVar w_value = mappedW.read(addr);
 				for (int k=0;k<iVecSize;++k){
 					sum[k] = sum[k]+w_value*x_w[k];
-					++cnt;
-					if (cnt==21){
-						optimization.pushDSPFactor(1.0, MathOps.ALL);
-					}
 				}
 			}
 		}
@@ -93,8 +85,6 @@ class CNN_FW_Conv_V1Kernel extends Kernel {
 		}
 
 		io.output("z", z, vecType, ctr_z);
-
-		optimization.popDSPFactor();
 	}
 
 }

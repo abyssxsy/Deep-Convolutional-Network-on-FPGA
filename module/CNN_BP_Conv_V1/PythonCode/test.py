@@ -5,8 +5,8 @@ import time
 import cPickle
 import utils
 utils.PROJ_NAME = 'CNN_BP_Conv_V1'
-TEST_DATA_PATH=os.getenv('CNN_TEST_DATA_PATH')
-TEST_DATA_SET = map(lambda f:os.path.join(TEST_DATA_PATH+'/conv_small',f),os.listdir(TEST_DATA_PATH+'/conv_small'))
+TEST_DATA_PATH = os.path.join(os.getenv('CNN_TEST_DATA_PATH'),'conv_large')
+TEST_DATA_SET = map(lambda f:os.path.join(TEST_DATA_PATH,f),os.listdir(TEST_DATA_PATH))
 type_size = 8
 
 def test(filename='data.bin'):
@@ -107,8 +107,8 @@ def main_2(filename=None):
         if not test(f):
             return False
     return True
-def main_0():
-    main_1()
+def main_0(ver='Simulation'):
+    main_1(ver)
     main_2()
 
 if __name__=='__main__':
