@@ -5,7 +5,7 @@ import time
 import cPickle
 import utils
 utils.PROJ_NAME = 'CNN_BP_Conv_V2'
-TEST_DATA_PATH = os.path.join(os.getenv('CNN_TEST_DATA_PATH'),'conv_small')
+TEST_DATA_PATH = os.path.join(os.getenv('CNN_TEST_DATA_PATH'),'conv_large')
 TEST_DATA_SET = map(lambda f:os.path.join(TEST_DATA_PATH,f),os.listdir(TEST_DATA_PATH))
 type_size = 8
 

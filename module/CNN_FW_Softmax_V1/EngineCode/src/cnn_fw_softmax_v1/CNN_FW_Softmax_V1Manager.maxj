@@ -115,8 +115,10 @@ public class CNN_FW_Softmax_V1Manager extends CustomManager {
 	private void configBuild(CNN_FW_Softmax_V1EngineParameters params) {
 		BuildConfig buildConfig = getBuildConfig();
 		buildConfig.setMPPRCostTableSearchRange(params.getMPPRStartCT(), params.getMPPREndCT());
-		buildConfig.setMPPRParallelism(params.getMPPRThreads());
+		//buildConfig.setMPPRParallelism(params.getMPPRThreads());
 		buildConfig.setMPPRRetryNearMissesThreshold(params.getMPPRRetryThreshold());
+
+		buildConfig.setMPPRParallelism(4);
 	}
 
 	public static void main(String[] args) {
