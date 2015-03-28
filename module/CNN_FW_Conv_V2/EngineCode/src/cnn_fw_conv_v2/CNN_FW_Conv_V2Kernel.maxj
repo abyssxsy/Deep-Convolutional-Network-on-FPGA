@@ -1,0 +1,123 @@
+package cnn_fw_conv_v2;
+
+import com.maxeler.maxcompiler.v2.kernelcompiler.Kernel;
+import com.maxeler.maxcompiler.v2.kernelcompiler.KernelParameters;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.LMemCommandStream;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.Count;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.Count.Counter;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.memory.Memory;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEType;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEVar;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.composite.DFEVector;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.composite.DFEVectorType;
+import com.maxeler.maxcompiler.v2.utils.MathUtils;
+
+class CNN_FW_Conv_V2Kernel extends Kernel {
+
+	//private static final DFEType type = dfeFloat(8, 24);
+	private static final DFEType type = dfeFloat(11, 53);
+
+	protected CNN_FW_Conv_V2Kernel(KernelParameters parameters
+		,int iK,int iParaBitWidth
+		,int iRowSize,int iColSize,int iBatchSize,int iBurstSize,int iVecSize) {
+		super(parameters);
+
+		DFEVectorType<DFEVar> vecType = new DFEVectorType<DFEVar>(type,iVecSize);
+		DFEVar vNiSize = io.scalarInput("ni",dfeUInt(iParaBitWidth));
+		DFEVar vNoSize = io.scalarInput("no",dfeUInt(iParaBitWidth));
+		int iBatchSubSize = iBatchSize/iBurstSize;
+		int iBurstSubSize = iBurstSize/iVecSize;
+
+		int iRowSizeBitWidth = MathUtils.bitsToAddress(iRowSize);
+		int iColSizeBitWidth = MathUtils.bitsToAddress(iColSize);
+		int iBatchBitWidth = MathUtils.bitsToAddress(iBatchSubSize);
+		int iBurstBitWidth = MathUtils.bitsToAddress(iBurstSubSize);
+		int iK2BitWidth = MathUtils.bitsToAddress(iK*iK);
+		int wSizeBitWidth = MathUtils.bitsToAddress(iRowSize*iColSize*iBatchSize);
+
+		Count.Params paraBurst = control.count.makeParams(iBurstBitWidth)
+			.withMax(iBurstSubSize);
+		Counter counterBurst = control.count.makeCounter(paraBurst);
+		Count.Params paraBatch = control.count.makeParams(iBatchBitWidth)
+			.withEnable(counterBurst.getWrap())
+			.withMax(iBatchSubSize);
+		Counter counterBatch = control.count.makeCounter(paraBatch);
+		Count.Params paraCol = control.count.makeParams(iColSizeBitWidth)
+			.withEnable(counterBatch.getWrap())
+			.withMax(iColSize);
+		Counter counterCol = control.count.makeCounter(paraCol);
+		Count.Params paraRow = control.count.makeParams(iRowSizeBitWidth)
+			.withEnable(counterCol.getWrap())
+			.withMax(iRowSize);
+		Counter counterRow = control.count.makeCounter(paraRow);
+		Count.Params paraNo = control.count.makeParams(iParaBitWidth)
+			.withEnable(counterRow.getWrap())
+			.withMax(vNoSize);
+		Counter counterNo = control.count.makeCounter(paraNo);
+		Count.Params paraNi = control.count.makeParams(iParaBitWidth)
+			.withEnable(counterNo.getWrap())
+			.withMax(vNiSize);
+		Counter counterNi = control.count.makeCounter(paraNi);
+		Count.Params wPara = control.count.makeParams(wSizeBitWidth)
+			.withMax(iRowSize*iColSize*iBatchSubSize*iBurstSubSize);//DONE: burst size
+		Counter counterW = control.count.makeCounter(wPara);
+
+		DFEVar iIdx = counterNi.getCount();
+		DFEVar oIdx = counterNo.getCount();
+		DFEVar row = counterRow.getCount();
+		DFEVar col = counterCol.getCount();
+		DFEVar batch = counterBatch.getCount();
+		DFEVar burst = counterBurst.getCount();
+		DFEVar wIdx = counterW.getCount();
+
+		DFEVar ctr_b = iIdx.eq(0) & wIdx.eq(0);
+		DFEVar in_b = io.input("b", type, ctr_b);
+		DFEVector<DFEVar> b_vec = vecType.newInstance(this);
+		for (int k=0;k<iVecSize;++k){
+			b_vec[k] <== in_b;
+		}
+
+		DFEVar ctr_w = (wIdx<iK*iK);
+		DFEVar in_w = io.input("w", type, ctr_w);
+		Memory<DFEVar> mappedW = mem.alloc(type, iK*iK);
+		mappedW.write(wIdx.slice(0,iK2BitWidth), in_w, ctr_w);
+
+		//DFEVector<DFEVar> x = constant.vect(iVecSize, type, 0.0);
+		DFEVar x_addr_base = io.scalarInput("x_addr_base", dfeUInt(32));
+		DFEVector<DFEVar> x = io.input("x", vecType);
+		LMemCommandStream.makeKernelOutput("xCmdStream",
+			burst.eq(0),												// control
+			x_addr_base+((iIdx.cast(dfeUInt(32))*iRowSize+row.cast(dfeUInt(32)))*iColSize+col.cast(dfeUInt(32)))*iBatchSubSize+batch.cast(dfeUInt(32)),	// address
+			constant.var(dfeUInt(8),1),							// size
+			constant.var(dfeUInt(7),0),							//	inc
+			constant.var(dfeUInt(1),0),							// stream
+			constant.var(false));									// tag
+
+		DFEVar ctr_z = (row>=(iK-1)) & (col>=(iK-1));
+		DFEVector<DFEVar> in_z = io.input("z_old", vecType, ctr_z);
+		DFEVector<DFEVar> z = vecType.newInstance(this);
+		DFEVector<DFEVar> z_old = iIdx.eq(0)?b_vec:in_z;
+
+		DFEVar sum[] = new DFEVar[iVecSize];
+		for (int k=0;k<iVecSize;++k){
+			sum[k] = z_old[k];
+		}
+		for (int i=0;i<iK;++i){
+			for (int j=0;j<iK;++j){
+				int x_offset = -((iK-1-i)*iColSize+(iK-1-j))*iBatchSubSize*iBurstSubSize;//Done: burst size
+				DFEVector<DFEVar> x_w = stream.offset(x, x_offset);
+				DFEVar addr = constant.var(dfeUInt(iK2BitWidth),i*iK+j);
+				DFEVar w_value = mappedW.read(addr);
+				for (int k=0;k<iVecSize;++k){
+					sum[k] = sum[k]+w_value*x_w[k];
+				}
+			}
+		}
+		for (int k=0;k<iVecSize;++k){
+			z[k] <== sum[k];
+		}
+
+		io.output("z", z, vecType, ctr_z);
+	}
+
+}

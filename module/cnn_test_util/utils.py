@@ -55,7 +55,8 @@ def gen_conv_data(filename='data.bin',ni=20,no=50,row=12,col=12,k=5,batch_size=3
             for i3 in xrange(row-k+1) for i4 in xrange(col-k+1)
         ])
         for i7 in xrange(batch_size)] for i6 in xrange(k)] for i5 in xrange(k)] for i2 in xrange(no)] for i1 in xrange(ni)]
-    fb = [v for v in b for i3 in xrange(row-k+1) for i4 in xrange(col-k+1) for i7 in xrange(batch_size)]
+    #fb = [v for v in b for i3 in xrange(row-k+1) for i4 in xrange(col-k+1) for i7 in xrange(batch_size)]
+    fb = b
     fw = [w[i1][i2][i5][i6] for i1 in xrange(ni) for i2 in xrange(no) for i5 in xrange(k) for i6 in xrange(k)]
     fx = [x[i1][i3][i4][i7] for i1 in xrange(ni) for i3 in xrange(row) for i4 in xrange(col) for i7 in xrange(batch_size)]
     fz = [z[i2][i3][i4][i7] for i2 in xrange(no) for i3 in xrange(row-k+1) for i4 in xrange(col-k+1) for i7 in xrange(batch_size)]
