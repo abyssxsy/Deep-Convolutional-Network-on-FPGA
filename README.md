@@ -15,9 +15,11 @@ a simplified version of LeNet5
 |CNN_BP_Conv_V2 - Small|1,SUC;**2,SUC**|y|y|y|y|y|
 |CNN_BP_Conv_V2 - Large|**2,SUC**|y|y| |y|y|
 |CNN_FW_MaxPool_V0|N/A|y|y|y|y|y|
-|CNN_FW_MaxPool_V1|12,Failed;**8,SUC**|y|y|y|y|y|
+|CNN_FW_MaxPool_V1 - Small|12,Failed;**8,SUC**|y|y|y|y|y|
+|CNN_FW_MaxPool_V1 - Large|8,SUC;12,ing|y|y| |y|y|
 |CNN_BP_MaxPool_V0|N/A|y|y|y|y|y|
-|CNN_BP_MaxPool_V1|**12,SUC**|y|y|y|y|y|
+|CNN_BP_MaxPool_V1 - Small|**12,SUC**|y|y|y|y|y|
+|CNN_BP_MaxPool_V1 - Large|**12,SUC**|y|y| |y|y|
 |CNN_FW_Softmax_V0|Discarded.1| | | | | |
 |CNN_FW_Softmax_V1|**12,SUC**|y|y|y|y|y|
 |CNN_BP_Softmax_V0|Discarded.1| | | | | |
