@@ -2,6 +2,22 @@
 a simplified version of LeNet5
 
 ## Double Precision
+|Name     |Vector Size|Vector Size Decoupled Interface|util for test|sim test|build hw|hw test|resource utilization|
+|:--------|:---------:|:-----------------------------:|:-----------:|:------:|:------:|:-----:|:------------------:|
+|CNN_FW_Conv_V0_DP_L0_0|4,todo|y|y|y| | | |
+|CNN_FW_Conv_V0_DP_L1_0|4,todo|y|y|y| | | |
+|CNN_BP_Conv_V0_DP_L0_0|2,ing|y|y|**N**| | | |
+|CNN_BP_Conv_V0_DP_L1_0|2,todo| | | | | | |
+|CNN_FW_MaxPool_V0_DP_L0_0|8,todo|y|y|y| | | |
+|CNN_FW_MaxPool_V0_DP_L1_0|8,todo|y|y|y| | | |
+|CNN_BP_MaxPool_V0_DP_L0_0|12,ing|y|y|y| | | |
+|CNN_BP_MaxPool_V0_DP_L1_0|12,todo|y|y|y| | | |
+|CNN_FW_Softmax_V0_DP_L3_0|12,todo|y|y|y| | | |
+|CNN_BP_Softmax_V0_DP_L3_0|24,todo|y|y|y| | | |
+
+
+
+##discarded
 |Name     |Vector Size|Vector Size Decoupled Interface|util for test|sim test|build hw|hw test|
 |:--------|:---------:|:-----------------------------:|:-----------:|:------:|:------:|:-----:|
 |CNN_FW_Conv_V0   |N/A|y|y|y|y|y|
@@ -15,8 +31,8 @@ a simplified version of LeNet5
 |CNN_BP_Conv_V2 - Small|1,SUC;**2,SUC**|y|y|y|y|y|
 |CNN_BP_Conv_V2 - Large|**2,SUC**|y|y| |y|y|
 |CNN_FW_MaxPool_V0|N/A|y|y|y|y|y|
-|CNN_FW_MaxPool_V1 - Small|**8,SUC**;12,opt,todo|y|y|y|y|y|
-|CNN_FW_MaxPool_V1 - Large|8,SUC;12,ing|y|y| |y|y|
+|CNN_FW_MaxPool_V1 - Small|**8,SUC**;12,ing|y|y|y|y|y|
+|CNN_FW_MaxPool_V1 - Large|12,Failed;**8,SUC**|y|y| |y|y|
 |CNN_BP_MaxPool_V0|N/A|y|y|y|y|y|
 |CNN_BP_MaxPool_V1 - Small|**12,SUC**|y|y|y|y|y|
 |CNN_BP_MaxPool_V1 - Large|**12,SUC**|y|y| |y|y|
