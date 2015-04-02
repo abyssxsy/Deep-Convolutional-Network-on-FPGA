@@ -4,21 +4,31 @@ a simplified version of LeNet5
 ## Double Precision
 |Name     |Vector Size|Vector Size Decoupled Interface|util for test|sim test|build hw|hw test|resource utilization|
 |:--------|:---------:|:-----------------------------:|:-----------:|:------:|:------:|:-----:|:------------------:|
-|CNN_FW_Conv_V0_DP_L0_0|4,opt,Failed|y|y|y| | | |
-|CNN_FW_Conv_V0_DP_L0_0|4,no opt,Failed|y|y|y| | | |
-|CNN_FW_Conv_V0_DP_L1_0|3,opt,ing|y|y|y| | | |
+|CNN_FW_Conv_V0_DP_L0_0|4,opt,Failed|y|y| | | | |
+|CNN_FW_Conv_V0_DP_L0_0|4,no opt,Failed|y|y| | | | |
+|CNN_FW_Conv_V0_DP_L0_0|**3,opt,SUC**|y|y| |y|y||
+|CNN_FW_Conv_V0_DP_L1_0|3,opt,Failed|y|y| | | | |
+|CNN_FW_Conv_V0_DP_L1_0|3,no opt,Failed|y|y| | | | |
+|CNN_FW_Conv_V0_DP_L1_0|2,opt,ing1|y|y| | | | |
+|:--------|:---------:|:-----------------------------:|:-----------:|:------:|:------:|:-----:|:------------------:|
 |CNN_BP_Conv_V0_DP_L0_0|2,opt,Failed|y|y|**N**| | | |
 |CNN_BP_Conv_V0_DP_L0_0|2,no opt,todo|y|y|**N**| | | |
-|CNN_BP_Conv_V0_DP_L1_0|1,todo| | | | | | |
-|CNN_FW_MaxPool_V0_DP_L0_0|8,Failed|y|y|y| | | |
-|CNN_FW_MaxPool_V0_DP_L1_0|**8,SUC**|y|y|y| | | |
-|CNN_BP_MaxPool_V0_DP_L0_0|**12,opt,SUC**|y|y|y| | | |
-|CNN_BP_MaxPool_V0_DP_L0_0|12,no opt,Failed|y|y|y| | | |
-|CNN_BP_MaxPool_V0_DP_L1_0|12,opt,ing|y|y|y| | | |
-|CNN_BP_MaxPool_V0_DP_L1_0|12,no opt,Failed|y|y|y| | | |
-|CNN_FW_Softmax_V0_DP_L3_0|**12,SUC**|y|y|y| | | |
-|CNN_BP_Softmax_V0_DP_L3_0|24,Failed|y|y|y| | | |
-|CNN_BP_Softmax_V0_DP_L3_0|12,todo|y|y|y| | | |
+|CNN_BP_Conv_V0_DP_L0_0|**1,no opt,SUC**|y|y| |y|y| |
+|CNN_BP_Conv_V0_DP_L1_0|**1,no opt,SUC**|y|y| |y|y| |
+|:--------|:---------:|:-----------------------------:|:-----------:|:------:|:------:|:-----:|:------------------:|
+|CNN_FW_MaxPool_V0_DP_L0_0|8,opt,Failed|y|y| | | | |
+|CNN_FW_MaxPool_V0_DP_L0_0|6,opt,ing2|y|y| | | | |
+|CNN_FW_MaxPool_V0_DP_L1_0|**8,SUC**|y|y| |y|y| |
+|:--------|:---------:|:-----------------------------:|:-----------:|:------:|:------:|:-----:|:------------------:|
+|CNN_BP_MaxPool_V0_DP_L0_0|**12,opt,SUC**|y|y| |y|y| |
+|CNN_BP_MaxPool_V0_DP_L0_0|12,no opt,Failed|y|y| | | | |
+|CNN_BP_MaxPool_V0_DP_L1_0|**12,opt,SUC**|y|y| |y|y| |
+|CNN_BP_MaxPool_V0_DP_L1_0|12,no opt,Failed|y|y| | | | |
+|:--------|:---------:|:-----------------------------:|:-----------:|:------:|:------:|:-----:|:------------------:|
+|CNN_FW_Softmax_V0_DP_L3_0|**12,opt,SUC**|y|y| |y|y| |
+|:--------|:---------:|:-----------------------------:|:-----------:|:------:|:------:|:-----:|:------------------:|
+|CNN_BP_Softmax_V0_DP_L3_0|24,opt,Failed|y|y| | | | |
+|CNN_BP_Softmax_V0_DP_L3_0|**12,opt,SUC**|y|y| |y|y| |
 
 
 
