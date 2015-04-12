@@ -1,0 +1,81 @@
+package cnn_bp_conv_v0_dp_l0_0;
+
+import com.maxeler.maxcompiler.v2.kernelcompiler.Kernel;
+import com.maxeler.maxcompiler.v2.kernelcompiler.KernelParameters;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.LMemCommandStream;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.Count;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.core.Count.Counter;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEType;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEVar;
+import com.maxeler.maxcompiler.v2.utils.MathUtils;
+
+class CNN_BP_Conv_V0_DP_L0_0Addr_Generator extends Kernel {
+
+	//private static final DFEType type = dfeFloat(8, 24);
+	private static final DFEType type = dfeFloat(11, 53);
+
+	protected CNN_BP_Conv_V0_DP_L0_0Addr_Generator(KernelParameters parameters
+		,int iK,int iParaBitWidth
+		,int iRowSize,int iColSize,int iBatchSize,int iBurstSize,int iVecSize) {
+		super(parameters);
+
+		DFEVar vNiSize = io.scalarInput("ni",dfeUInt(iParaBitWidth));
+		DFEVar vNoSize = io.scalarInput("no",dfeUInt(iParaBitWidth));
+		int iBatchSubSize = iBatchSize/iBurstSize;
+		int iBurstSubSize = iBurstSize/iVecSize;
+
+		int iRowSizeBitWidth = MathUtils.bitsToAddress(iRowSize);
+		int iColSizeBitWidth = MathUtils.bitsToAddress(iColSize);
+		int iBatchBitWidth = MathUtils.bitsToAddress(iBatchSubSize);
+		int iBurstBitWidth = MathUtils.bitsToAddress(iBurstSubSize);
+
+		Count.Params paraBurst = control.count.makeParams(iBurstBitWidth)
+			.withMax(iBurstSubSize);
+		Counter counterBurst = control.count.makeCounter(paraBurst);
+		Count.Params paraBatch = control.count.makeParams(iBatchBitWidth)
+			.withEnable(counterBurst.getWrap())
+			.withMax(iBatchSubSize);
+		Counter counterBatch = control.count.makeCounter(paraBatch);
+		Count.Params paraCol = control.count.makeParams(iColSizeBitWidth)
+			.withEnable(counterBatch.getWrap())
+			.withMax(iColSize);
+		Counter counterCol = control.count.makeCounter(paraCol);
+		Count.Params paraRow = control.count.makeParams(iRowSizeBitWidth)
+			.withEnable(counterCol.getWrap())
+			.withMax(iRowSize);
+		Counter counterRow = control.count.makeCounter(paraRow);
+		Count.Params paraNo = control.count.makeParams(iParaBitWidth)
+			.withEnable(counterRow.getWrap())
+			.withMax(vNoSize);
+		Counter counterNo = control.count.makeCounter(paraNo);
+		Count.Params paraNi = control.count.makeParams(iParaBitWidth)
+			.withEnable(counterNo.getWrap())
+			.withMax(vNiSize);
+		Counter counterNi = control.count.makeCounter(paraNi);
+
+		DFEVar iIdx = counterNi.getCount();
+		DFEVar oIdx = counterNo.getCount();
+		DFEVar row = counterRow.getCount();
+		DFEVar col = counterCol.getCount();
+		DFEVar batch = counterBatch.getCount();
+		DFEVar burst = counterBurst.getCount();
+
+		DFEVar x_addr_base = io.scalarInput("x_addr_base", dfeUInt(32));
+		DFEVar x_grad_addr_base = io.scalarInput("x_grad_addr_base", dfeUInt(32));
+		LMemCommandStream.makeKernelOutput("xCmdStream",
+			burst.eq(0),												// control
+			x_addr_base+((iIdx.cast(dfeUInt(32))*iRowSize+row.cast(dfeUInt(32)))*iColSize+col.cast(dfeUInt(32)))*iBatchSubSize+batch.cast(dfeUInt(32)),			// address
+			constant.var(dfeUInt(8),1),							// size
+			constant.var(dfeUInt(7),0),							//	inc
+			constant.var(dfeUInt(1),0),							// stream
+			constant.var(false));									// tag
+		LMemCommandStream.makeKernelOutput("xGradCmdStream",
+			oIdx.eq(vNoSize-1) & burst.eq(0),					// control
+			x_grad_addr_base+((iIdx.cast(dfeUInt(32))*iRowSize+row.cast(dfeUInt(32)))*iColSize+col.cast(dfeUInt(32)))*iBatchSubSize+batch.cast(dfeUInt(32)),	// address
+			constant.var(dfeUInt(8),1),							// size
+			constant.var(dfeUInt(7),0),							//	inc
+			constant.var(dfeUInt(1),0),							// stream
+			constant.var(false));									// tag
+	}
+
+}
